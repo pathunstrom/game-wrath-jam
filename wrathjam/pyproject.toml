@@ -1,0 +1,37 @@
+[tool.briefcase]
+project_name = "Wrath Jam"
+bundle = "dev.thunstrom.wrathjam"
+version = "0.0.1"
+url = "https://pathunstrom.itch.io/wrath-jam"
+license = "Proprietary"
+author = 'Piper Thunstrom'
+author_email = "pathunstrom@gmail.com"
+
+[tool.briefcase.app.wrathjam]
+formal_name = "Wrath Jam"
+description = "A top down shooter about using your anger."
+icon = "src/wrathjam/resources/wrathjam"
+sources = ['src/wrathjam']
+requires = [
+    'ppb~=1.1',
+]
+
+
+[tool.briefcase.app.wrathjam.macOS]
+requires = [
+    'std-nslog~=1.0.0'
+]
+
+[tool.briefcase.app.wrathjam.linux]
+requires = []
+system_requires = []
+
+[tool.briefcase.app.wrathjam.windows]
+requires = []
+
+# Mobile deployments
+[tool.briefcase.app.wrathjam.iOS]
+supported = false
+
+[tool.briefcase.app.wrathjam.android]
+supported = false
