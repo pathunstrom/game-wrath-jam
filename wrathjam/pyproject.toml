@@ -14,6 +14,8 @@ icon = "src/wrathjam/resources/wrathjam"
 sources = ['src/wrathjam']
 requires = [
     'ppb~=1.1',
+    'misbehave',
+    'git+https://github.com/pathunstrom/splash-pathunstrom.git'
 ]
 
 

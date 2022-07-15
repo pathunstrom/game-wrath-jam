@@ -12,15 +12,13 @@ except ImportError:
     import importlib_metadata
 
 import ppb
+import pathunstrom_splash as splash
+from ppb import buttons
+from ppb import keycodes
 
-
-class WrathJam(ppb.Scene):
-    def __init__(self, **props):
-        super().__init__(**props)
-
-        self.add(ppb.Sprite(
-            image=ppb.Image('wrathjam/resources/wrathjam.png'),
-        ))
+from wrathjam.scenes import main_menu
+from wrathjam.systems import controller
+from wrathjam import controls
 
 
 def main():
@@ -41,6 +39,9 @@ def main():
     os.environ['SDL_VIDEO_X11_WMCLASS'] = metadata['Formal-Name']
 
     ppb.run(
-        starting_scene=WrathJam,
+        starting_scene=splash.Splash(next_scene=main_menu.Scene),
         title='Wrath Jam',
+        resolution=(1600, 900),
+        systems=[controller.ControllerSystem],
+        inputs=controls.inputs
     )
