@@ -13,8 +13,6 @@ except ImportError:
 
 import ppb
 import pathunstrom_splash as splash
-from ppb import buttons
-from ppb import keycodes
 
 from wrathjam.scenes import main_menu
 from wrathjam.systems import controller
