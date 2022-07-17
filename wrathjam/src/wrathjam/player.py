@@ -1,10 +1,47 @@
+from dataclasses import dataclass
+from time import monotonic
+from typing import Literal, Callable, Union
+
 import ppb
 
+from wrathjam import config
 from wrathjam import controls
 from wrathjam import events
 
+DEBUG = config.DEBUG
 
-DEBUG = True
+
+@dataclass
+class Attack:
+    last_used: Union[float, int] = 0
+    cool_down: Union[float, int] = 1
+    tag: str = ""
+
+    def __call__(self, player: 'Sprite', scene: ppb.Scene, signal_function: Callable[[type], None]) -> bool:
+        if monotonic() <= self.last_used + self.cool_down:
+            return False
+        if DEBUG:
+            print(f"{self.name} fired at wrath level {player.wrath_level}.")
+        self.effect(player, scene, signal_function)
+        self.last_used = monotonic()
+        return True
+
+    def effect(self, player: 'Sprite', scene: ppb.Scene, signal_function: Callable[[type], None]) -> None:
+        pass
+
+    @property
+    def name(self):
+        return f"Generic Attack {self.tag}"
+
+
+class Punch(Attack):
+
+    def effect(self, player: 'Sprite', scene: ppb.Scene, signal_function: Callable[[type], None]) -> None:
+        pass
+
+    @property
+    def name(self):
+        return "Punch"
 
 
 class Sprite(ppb.Sprite):
@@ -13,7 +50,18 @@ class Sprite(ppb.Sprite):
 
     base_speed = 6
     wrath = 0
-    debug_wrath_level = 1
+    debug_wrath_level: Literal[1, 2, 3] = 1
+    primary_attacks: dict[Literal[1, 2, 3], Attack] = {
+        1: Attack(tag="p1"),
+        2: Attack(tag="p2"),
+        3: Attack(tag="p3")
+    }
+
+    secondary_attacks: dict[Literal[1, 2, 3], Attack] = {
+        1: Attack(tag="s1"),
+        2: Attack(tag="s2"),
+        3: Attack(tag="s3")
+    }
 
     @property
     def speed(self):
@@ -21,10 +69,15 @@ class Sprite(ppb.Sprite):
 
     def on_update(self, event, signal):
         control_state = event.controls
-        if control_state[controls.PRIMARY_ATTACK] or control_state[controls.SECONDARY_ATTACK]:
-            pass
-        else:
-            self.move(event)
+        attacked = False
+
+        if not attacked and control_state[controls.PRIMARY_ATTACK]:
+            attack = self.primary_attacks[self.wrath_level]
+            attacked = attack(self, event, signal)
+        if not attacked and control_state[controls.SECONDARY_ATTACK]:
+            attack = self.secondary_attacks[self.wrath_level]
+            attacked = attack(self, event, signal)
+        self.move(event)
 
     def move(self, event):
         vertical = event.controls[controls.VERTICAL]
@@ -35,7 +88,7 @@ class Sprite(ppb.Sprite):
         self.position += control_direction * self.speed * event.time_delta
 
     @property
-    def wrath_level(self):
+    def wrath_level(self) -> Literal[1, 2, 3]:
         if DEBUG:
             return self.debug_wrath_level
         else:
