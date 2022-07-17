@@ -36,3 +36,10 @@ def crossfade(ease_1, ease_2, time):
 
 
 smoother_step = partial(crossfade, smooth_start_3, smooth_stop_3)
+
+
+def clamp(min_value, max_value, value):
+    return min(max(value, min_value), max_value)
+
+
+clamp_normal = partial(clamp, 0, 1)

@@ -6,6 +6,7 @@ import ppb
 
 from wrathjam import config
 from wrathjam import controls
+from wrathjam import damage
 from wrathjam import events
 
 DEBUG = config.DEBUG
@@ -35,9 +36,18 @@ class Attack:
 
 
 class Punch(Attack):
+    cool_down = 0.25
 
     def effect(self, player: 'Sprite', scene: ppb.Scene, signal_function: Callable[[type], None]) -> None:
-        pass
+        scene.add(
+            damage.Hurtbox(
+                final_position=player.position + (player.facing * 1),
+                life_span=0.25,
+                position=player.position + (player.facing * 0.5),
+                size=.5,
+                grow_end=1.5
+            )
+        )
 
     @property
     def name(self):
@@ -52,7 +62,7 @@ class Sprite(ppb.Sprite):
     wrath = 0
     debug_wrath_level: Literal[1, 2, 3] = 1
     primary_attacks: dict[Literal[1, 2, 3], Attack] = {
-        1: Attack(tag="p1"),
+        1: Punch(),
         2: Attack(tag="p2"),
         3: Attack(tag="p3")
     }
@@ -73,10 +83,10 @@ class Sprite(ppb.Sprite):
 
         if not attacked and control_state[controls.PRIMARY_ATTACK]:
             attack = self.primary_attacks[self.wrath_level]
-            attacked = attack(self, event, signal)
+            attacked = attack(self, event.scene, signal)
         if not attacked and control_state[controls.SECONDARY_ATTACK]:
             attack = self.secondary_attacks[self.wrath_level]
-            attacked = attack(self, event, signal)
+            attacked = attack(self, event.scene, signal)
         self.move(event)
 
     def move(self, event):
@@ -86,6 +96,12 @@ class Sprite(ppb.Sprite):
         if control_direction:
             control_direction = control_direction.normalize()
         self.position += control_direction * self.speed * event.time_delta
+
+    def on_mouse_motion(self, event: ppb.events.MouseMotion, signal):
+        direction = event.position - self.position
+        if direction:
+            direction = direction.normalize()
+            self.facing = direction
 
     @property
     def wrath_level(self) -> Literal[1, 2, 3]:
