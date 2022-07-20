@@ -13,6 +13,7 @@ description = "A top down shooter about using your anger."
 icon = "src/wrathjam/resources/wrathjam"
 sources = ['src/wrathjam']
 requires = [
+    'pysdl2-dll<2.0.22',
     'ppb~=1.1',
     'misbehave',
     'git+https://github.com/pathunstrom/splash-pathunstrom.git'

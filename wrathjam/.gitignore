@@ -64,3 +64,5 @@ windows/
 android/
 linux/
 django/
+
+*.dev.log
