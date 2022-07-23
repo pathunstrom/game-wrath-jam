@@ -12,10 +12,14 @@ DEBUG_ADD_WRATH_LEVEL = "add_wrath"
 DEBUG_REMOVE_WRATH_LEVEL = "remove_wrath"
 
 inputs = [
-            controller.MomentarySwitch(PRIMARY_ATTACK, buttons.Primary),
-            controller.MomentarySwitch(SECONDARY_ATTACK, buttons.Secondary),
-            controller.ButtonAxis(HORIZONTAL, keycodes.A, keycodes.D),
-            controller.ButtonAxis(VERTICAL, keycodes.S, keycodes.W),
-            controller.FireEvent(DEBUG_ADD_WRATH_LEVEL, keycodes.BracketRight, events.AddWrathLevel),
-            controller.FireEvent(DEBUG_REMOVE_WRATH_LEVEL, keycodes.BracketLeft, events.RemoveWrathLevel)
-        ]
+    controller.MomentarySwitch(PRIMARY_ATTACK, buttons.Primary),
+    controller.MomentarySwitch(SECONDARY_ATTACK, buttons.Secondary),
+    controller.ButtonAxis(HORIZONTAL, keycodes.A, keycodes.D),
+    controller.ButtonAxis(VERTICAL, keycodes.S, keycodes.W),
+    controller.FireEvent(
+        DEBUG_ADD_WRATH_LEVEL, keycodes.BracketRight, events.AddWrathLevel
+    ),
+    controller.FireEvent(
+        DEBUG_REMOVE_WRATH_LEVEL, keycodes.BracketLeft, events.RemoveWrathLevel
+    ),
+]

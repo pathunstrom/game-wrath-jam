@@ -1,6 +1,4 @@
-from random import randrange, gauss
-from time import monotonic
-from typing import Literal, Callable, Union
+from typing import Literal
 
 import ppb
 
@@ -12,76 +10,6 @@ from wrathjam import events
 DEBUG = config.DEBUG
 
 
-class Attack:
-    last_used: Union[float, int] = 0
-    cool_down: Union[float, int] = 1
-
-    def __call__(self, player: 'Sprite', scene: ppb.Scene, signal_function: Callable[[type], None]) -> bool:
-        now = monotonic()
-        if now <= self.last_used + self.cool_down:
-            return False
-        if DEBUG:
-            print(f"{self.name} fired at wrath level {player.wrath_level} at {now}.")
-        self.effect(player, scene, signal_function)
-        self.last_used = now
-        return True
-
-    def effect(self, player: 'Sprite', scene: ppb.Scene, signal_function: Callable[[type], None]) -> None:
-        pass
-
-    @property
-    def name(self):
-        return type(self).__name__
-
-
-class Punch(Attack):
-    cool_down = 0.75
-
-    def effect(self, player: 'Sprite', scene: ppb.Scene, signal_function: Callable[[type], None]) -> None:
-        scene.add(
-            damage.Hurtbox(
-                final_position=player.position + (player.facing * 1),
-                life_span=0.30,
-                position=player.position + (player.facing * 0.5),
-                size=.5,
-                grow_end=1.5
-            )
-        )
-
-
-class Kick(Attack):
-    cool_down = 0.4
-
-    def effect(self, player: 'Sprite', scene: ppb.Scene, signal_function: Callable[[type], None]) -> None:
-        scene.add(
-            damage.Hurtbox(
-                final_position=player.position + (player.facing * 3),
-                life_span=0.3,
-                position=player.position + (player.facing * 0.5),
-                size=1
-            )
-        )
-
-
-class RapidFire(Attack):
-    cool_down = 0.12
-
-    def effect(self, player: 'Sprite', scene: ppb.Scene, signal_function: Callable[[type], None]) -> None:
-        drifted_rotation: ppb.Vector = player.facing.rotate(self.random_degrees())
-        scene.add(
-            damage.Hurtbox(
-                final_position=player.position + (drifted_rotation * 8),
-                position=player.position + (player.facing * 0.5),
-                life_span=0.6,
-                size=0.5,
-                grow_end=0.6
-            )
-        )
-
-    def random_degrees(self):
-        return randrange(-26, 26, 2)
-
-
 class Sprite(ppb.Sprite):
     size = 1
     image = ppb.Circle(100, 175, 50)
@@ -89,16 +17,16 @@ class Sprite(ppb.Sprite):
     base_speed = 6
     wrath = 0
     debug_wrath_level: Literal[1, 2, 3] = 1
-    primary_attacks: dict[Literal[1, 2, 3], Attack] = {
-        1: Punch(),
-        2: Kick(),
-        3: RapidFire()
+    primary_attacks: dict[Literal[1, 2, 3], damage.Attack] = {
+        1: damage.Punch(),
+        2: damage.Kick(),
+        3: damage.RapidFire(-26, 26, 2),
     }
 
-    secondary_attacks: dict[Literal[1, 2, 3], Attack] = {
-        1: Attack(),
-        2: Attack(),
-        3: Attack()
+    secondary_attacks: dict[Literal[1, 2, 3], damage.Attack] = {
+        1: damage.Attack(),
+        2: damage.Attack(),
+        3: damage.Attack(),
     }
 
     @property

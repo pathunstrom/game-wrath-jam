@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 import ppb
 
+
 @dataclass
 class AddWrathLevel:
     scene: ppb.Scene = None

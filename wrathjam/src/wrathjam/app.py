@@ -30,16 +30,16 @@ def main():
     # is set using environment variable.
 
     # Find the name of the module that was used to start the app
-    app_module = sys.modules['__main__'].__package__
+    app_module = sys.modules["__main__"].__package__
     # Retrieve the app's metadata
     metadata = importlib_metadata.metadata(app_module)
 
-    os.environ['SDL_VIDEO_X11_WMCLASS'] = metadata['Formal-Name']
+    os.environ["SDL_VIDEO_X11_WMCLASS"] = metadata["Formal-Name"]
 
     ppb.run(
         starting_scene=splash.Splash(next_scene=main_menu.Scene),
-        title='Wrath Jam',
+        title="Wrath Jam",
         resolution=(1600, 900),
         systems=[controller.ControllerSystem],
-        inputs=controls.inputs
+        inputs=controls.inputs,
     )

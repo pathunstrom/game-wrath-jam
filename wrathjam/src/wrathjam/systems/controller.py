@@ -9,12 +9,7 @@ from ppb import events
 from ppb import keycodes as key
 from ppb.systemslib import System
 
-__all__ = [
-    "ButtonAxis",
-    "MomentarySwitch",
-    "FireEvent",
-    "ControllerSystem"
-]
+__all__ = ["ButtonAxis", "MomentarySwitch", "FireEvent", "ControllerSystem"]
 
 
 PhysicalInput = Union[buttons.MouseButton, key.KeyCode]
@@ -25,6 +20,7 @@ class ButtonAxis(NamedTuple):
     A control that provides a value between -1 and 1.
 
     Currently maps to two physical inputs since ppb doesn't support joypads."""
+
     name: str
     default_negative: PhysicalInput
     default_positive: PhysicalInput
@@ -36,6 +32,7 @@ class FireEvent(NamedTuple):
 
     Does not add to the control dictionary, fires events instead.
     """
+
     name: str
     default: PhysicalInput
     event: type
@@ -45,6 +42,7 @@ class MomentarySwitch(NamedTuple):
     """
     A latching switch. Click once to turn on, and again to turn off.
     """
+
     name: str
     default: PhysicalInput
 
@@ -68,9 +66,14 @@ class ControllerSystem(System):
     they emit the event you declared.
     """
 
-    def __init__(self, *, engine: GameEngine,
-                 inputs: Iterable[SoftwareInput],
-                 key_config: dict = None, **kwargs):
+    def __init__(
+        self,
+        *,
+        engine: GameEngine,
+        inputs: Iterable[SoftwareInput],
+        key_config: dict = None,
+        **kwargs,
+    ):
         """
         Initialize the controller subsystem.
         It is advised that you do not initialize this subsystem outside of
@@ -81,10 +84,7 @@ class ControllerSystem(System):
         values.
         :param kwargs: Additional kwargs, required in ppb Systems.
         """
-        super().__init__(inputs=inputs,
-                         key_config=key_config,
-                         **kwargs
-                         )
+        super().__init__(inputs=inputs, key_config=key_config, **kwargs)
         self.__values = {}
         self.__inputs = {}
         self.__key_config = key_config or {}
@@ -108,10 +108,8 @@ class ControllerSystem(System):
     @add_control.register
     def add_axis(self, axis: ButtonAxis):
         self.__values[axis.name] = 0
-        neg_key = self.__key_config.get(f"{axis.name}_negative",
-                                        axis.default_negative)
-        pos_key = self.__key_config.get(f"{axis.name}_positive",
-                                        axis.default_positive)
+        neg_key = self.__key_config.get(f"{axis.name}_negative", axis.default_negative)
+        pos_key = self.__key_config.get(f"{axis.name}_positive", axis.default_positive)
         self.__inputs[neg_key] = axis.name, -1
         self.__inputs[pos_key] = axis.name, 1
 
@@ -124,8 +122,9 @@ class ControllerSystem(System):
     def extend_update(self, update_event: events.Update):
         update_event.controls = self.__values.copy()
 
-    def handle_input_activated(self, input_value: PhysicalInput,
-                               signal_function, position=None):
+    def handle_input_activated(
+        self, input_value: PhysicalInput, signal_function, position=None
+    ):
         name: str
         value: Union[int, type]
         name, value = self.__inputs.get(input_value, (None, None))
@@ -148,13 +147,10 @@ class ControllerSystem(System):
         self.handle_input_activated(key_event.key, signal)
 
     def on_button_pressed(self, button_event: events.ButtonPressed, signal):
-        self.handle_input_activated(button_event.button,
-                                    signal,
-                                    button_event.position)
+        self.handle_input_activated(button_event.button, signal, button_event.position)
 
     def on_key_released(self, key_event: events.KeyPressed, signal):
         self.handle_input_deactivated(key_event.key)
 
-    def on_button_released(self,
-                           button_event: events.ButtonReleased, signal):
+    def on_button_released(self, button_event: events.ButtonReleased, signal):
         self.handle_input_deactivated(button_event.button)
